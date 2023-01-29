@@ -1,29 +1,19 @@
 
-
-function main_client() {
-// Defines the client which will use the URI_identification class.
-    let test_URI = 'visma-identity://login?source=severa';
-    let test_URI2 = 'visma-identity://confirm?source=netvisor&paymentnumber=102226';
-    let test_URI3 = 'visma-identity://sign?source=vismasign&documentid=105ab44'
-    let invalid_URI = 'visma-identity://login?sorce=severa';
-
-    const URI_class = new URI_identification(test_URI2);
-    URI_class.printURI()
-    URI_scheme = URI_class.validateScheme();
-
-    console.log("PATH: "+URI_class.path)
-    console.log("SOURCE: "+JSON.stringify(URI_class.parameters))
-
-}
-
-main_client();
-console.log("Javascript file is running.")
-
-
-function URI_identification(URI) {
+module.exports = function URI_identification(URI) {
     // This is a constructor function, which creates URI object. The URI object has values URI, path and parameters.
     this.URI = URI;  // The given URI to the object
 
+
+    this.getURI = function() { // Returns the current URI
+        return this.URI;
+    }
+
+    this.setURI = function(newURI) { // This is used to set the URI, to run the parsing and then save the parsed path and parameters to the object.
+        this.URI = newURI;
+        parsedURI = this.parseURI();
+        this.path = parsedURI.path;
+        this.parameters = parsedURI.parameters;
+    }
 
     // This function logs the given URI to the console for debugging.
     this.printURI = function() {
@@ -69,7 +59,6 @@ function URI_identification(URI) {
         if(keysArray.sort().join(',') !== validPathParameters[path].sort().join(',')){
             parameter_json = "Current path does not have all of the required parameters or they are invalid."
         }
-
         return parameter_json
     }
 
@@ -82,7 +71,7 @@ function URI_identification(URI) {
         if(this.validateScheme() != true) return {"path" : "Invalid Schema", "parameters": "Invalid Schema"}
 
         //Splits the URI in to schema and rest of the URI which contains the path and parameters
-        let splitURI = URI.split(":");
+        let splitURI = this.URI.split(":");
         let scheme = splitURI[0];
 
         let pathURI = splitURI[1];
@@ -109,9 +98,6 @@ function URI_identification(URI) {
     }
 
     
-    let parsedURI = this.parseURI()
-    this.path = parsedURI.path;
-    this.parameters = parsedURI.parameters;
-    
+    this.setURI(this.URI) // Run the setURI when the object is created.
 
 }
